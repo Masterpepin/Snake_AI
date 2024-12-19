@@ -1,6 +1,12 @@
 from snake_env import SnakeEnv
 from dqn_agent import DQNAgent
 import numpy as np
+import time
+import pygame
+import os
+
+# Suppress TensorFlow logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Initialize environment and agent
 env = SnakeEnv()
@@ -9,18 +15,35 @@ action_size = 4  # Four possible actions: up, down, left, right
 agent = DQNAgent(state_shape, action_size)
 
 # Training parameters
-episodes = 500  # Number of games the agent will play
+episodes = 10  # Number of games the agent will play
 max_steps_per_episode = 500  # Maximum steps in a single game
-batch_size = 32  # Number of samples to train on at each step
+render_frequency = 1  # Render every N episodes
+fps = 10  # Frames per second (controls snake speed)
+
+# Initialize Pygame clock for consistent timing
+clock = pygame.time.Clock()
 
 # Training loop
 for episode in range(episodes):
     state = env.reset()  # Reset the game
     state = np.reshape(state, [1, *state_shape])  # Reshape for the neural network
     total_reward = 0
+    done = False
+    print(f"Starting Episode {episode + 1}/{episodes}")
 
-    for step in range(max_steps_per_episode):
-        # Agent takes an action
+    # Timer for consistent frame rate
+    last_time = time.time()
+
+    # Add a counter for training steps
+    # Add a counter for training steps
+    training_steps = 0
+
+    while not done:
+        # Render the game for visualization
+        if episode % render_frequency == 0:
+            env.render()
+
+        # Agent selects an action
         action = agent.act(state)
 
         # Environment processes the action
@@ -34,17 +57,26 @@ for episode in range(episodes):
         state = next_state
         total_reward += reward
 
-        # Train the agent with a batch from memory
-        agent.replay()
+        # Train the agent only every 10 steps
+        training_steps += 1
+        if training_steps % 10 == 0:
+            agent.replay()
 
-        if done:  # Game over
-            print(f"Episode: {episode + 1}/{episodes}, Score: {env.score}, Total Reward: {total_reward:.2f}, Epsilon: {agent.epsilon:.2f}")
-            break
+        # Limit the frame rate
+        clock.tick(fps)
+
+    # Log episode results
+    print(f"Episode: {episode + 1}/{episodes}, Score: {env.score}, Total Reward: {total_reward:.2f}, Epsilon: {agent.epsilon:.2f}")
 
     # Update the target network periodically
     if episode % 10 == 0:
         agent.update_target_model()
 
-    # Save the model periodically
-    if episode % 50 == 0:
+    if episode % 50 == 0:  # Save the model every 50 episodes
         agent.model.save(f"models/snake_dqn_{episode}.h5")
+
+# Quit Pygame after training
+agent.model.save("models/snake_dqn_final.h5")
+env.close()
+pygame.quit()
+

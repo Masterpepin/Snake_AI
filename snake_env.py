@@ -27,7 +27,7 @@ class SnakeEnv(Env):
         self.snake_body = [self.snake_pos[:]]
         self.food_pos = self._place_food()
         self.score = 0
-        self.done = False
+        self.done = False  # Game is not over
         self.direction = None
         return self._get_state()
 
@@ -51,7 +51,6 @@ class SnakeEnv(Env):
         elif self.direction == "DOWN":
             self.snake_pos[1] += self.BLOCK_SIZE
 
-        # Check for collisions
         if (self.snake_pos in self.snake_body[:-1] or
                 self.snake_pos[0] < 0 or self.snake_pos[0] >= self.WIDTH or
                 self.snake_pos[1] < 0 or self.snake_pos[1] >= self.HEIGHT):
@@ -73,18 +72,24 @@ class SnakeEnv(Env):
         return self._get_state(), reward, self.done, {}
 
     def render(self, mode="human"):
-        pygame.init()
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        pygame.display.set_caption("Snake AI")
-        self.screen.fill((0, 0, 0))
+        if not hasattr(self, "screen"):  # Initialize the screen only once
+            pygame.init()
+            self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+            pygame.display.set_caption("Snake AI")
+            self.clock = pygame.time.Clock()  # Add a clock
+
+        self.screen.fill((0, 0, 0))  # Clear the screen
 
         # Draw the food
         pygame.draw.rect(self.screen, (0, 255, 0), (*self.food_pos, self.BLOCK_SIZE, self.BLOCK_SIZE))
+
         # Draw the snake
         for block in self.snake_body:
             pygame.draw.rect(self.screen, (0, 0, 255), (*block, self.BLOCK_SIZE, self.BLOCK_SIZE))
 
-        pygame.display.flip()
+        pygame.display.flip()  # Update the display
+
+        self.clock.tick(10)  # Limit the game to 10 frames per second (adjust as needed)
 
     def _place_food(self):
         x = random.randint(1, self.GRID_WIDTH - 2) * self.BLOCK_SIZE
@@ -92,5 +97,26 @@ class SnakeEnv(Env):
         return [x, y]
 
     def _get_state(self):
-        # Use the snake's position, direction, and food position for the state
-        return np.array(self.snake_body, dtype=np.uint8).reshape((30, 20, 1))
+        # Create an empty grid
+        grid = np.zeros((self.GRID_WIDTH, self.GRID_HEIGHT), dtype=np.uint8)
+
+        # Mark the snake's body on the grid
+        for block in self.snake_body:
+            # Convert pixel positions to grid indices
+            grid_x, grid_y = block[0] // self.BLOCK_SIZE, block[1] // self.BLOCK_SIZE
+
+            # Ensure indices are within bounds
+            if 0 <= grid_x < self.GRID_WIDTH and 0 <= grid_y < self.GRID_HEIGHT:
+                grid[grid_x, grid_y] = 1  # Snake body marked as 1
+
+        # Mark the food position on the grid
+        food_x, food_y = self.food_pos[0] // self.BLOCK_SIZE, self.food_pos[1] // self.BLOCK_SIZE
+
+        # Ensure food indices are within bounds
+        if 0 <= food_x < self.GRID_WIDTH and 0 <= food_y < self.GRID_HEIGHT:
+            grid[food_x, food_y] = 2  # Food marked as 2
+
+        # Add a channel dimension for compatibility with CNNs
+        return np.expand_dims(grid, axis=-1)
+
+

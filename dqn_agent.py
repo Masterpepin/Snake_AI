@@ -2,6 +2,7 @@ import numpy as np
 import random
 import tensorflow as tf
 from tensorflow.keras import models, layers, optimizers
+from tensorflow.keras.models import load_model
 
 class DQNAgent:
     def __init__(self, state_shape, action_size):
@@ -18,6 +19,9 @@ class DQNAgent:
         self.target_model = self._build_model()  # Target network for stability
         self.update_target_model()  # Sync target model with main model
 
+    def load_model(self, model_path):
+        """Load a pre-trained model."""
+        self.model = load_model(model_path)
     def _build_model(self):
         """Builds the Q-network using Keras."""
         model = models.Sequential([
