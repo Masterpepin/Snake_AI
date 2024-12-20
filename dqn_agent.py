@@ -3,6 +3,12 @@ import random
 import tensorflow as tf
 from tensorflow.keras import models, layers, optimizers
 from tensorflow.keras.models import load_model
+from tensorflow.keras.losses import MeanSquaredError
+from tensorflow.keras.saving import register_keras_serializable
+
+@register_keras_serializable()
+def mse(y_true, y_pred):
+    return MeanSquaredError()(y_true, y_pred)
 
 class DQNAgent:
     def __init__(self, state_shape, action_size):

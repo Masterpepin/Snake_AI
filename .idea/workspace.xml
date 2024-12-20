@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e442b93-73d1-4127-bbbc-3f4d65dd458c" name="Changes" comment="changes in dqn_agent" />
+    <list default="true" id="2e442b93-73d1-4127-bbbc-3f4d65dd458c" name="Changes" comment="changes in dqn_agent">
+      <change afterPath="$PROJECT_DIR$/continue_training.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dqn_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/dqn_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/snake_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/snake_env.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

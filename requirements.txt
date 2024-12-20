@@ -2,10 +2,13 @@ absl-py==2.1.0
 astunparse==1.6.3
 certifi==2024.8.30
 charset-normalizer==3.4.0
+cloudpickle==3.1.0
 flatbuffers==24.3.25
 gast==0.6.0
 google-pasta==0.2.0
 grpcio==1.68.1
+gym==0.26.2
+gym-notices==0.0.8
 h5py==3.12.1
 idna==3.10
 keras==3.7.0

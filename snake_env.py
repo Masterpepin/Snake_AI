@@ -3,6 +3,7 @@ import pygame
 import random
 from gym import Env
 from gym.spaces import Discrete, Box
+import math
 
 class SnakeEnv(Env):
     def __init__(self):
@@ -56,16 +57,34 @@ class SnakeEnv(Env):
                 self.snake_pos[1] < 0 or self.snake_pos[1] >= self.HEIGHT):
             self.done = True
 
+            # Calculate the Euclidean distance to the food (before adding new body position)
+        distance_before = math.sqrt(
+            (self.snake_pos[0] - self.food_pos[0]) ** 2 +
+            (self.snake_pos[1] - self.food_pos[1]) ** 2
+        )
+
         # Add new position to the snake's body
         self.snake_body.append(self.snake_pos[:])
         if self.snake_pos == self.food_pos:
             self.score += 1
             self.food_pos = self._place_food()
+            reward = 10
         else:
             self.snake_body.pop(0)
 
-        # Calculate reward
-        reward = 1 if self.snake_pos == self.food_pos else -0.1
+            # Calculate the distance to the food after the move
+            distance_after = math.sqrt(
+                (self.snake_pos[0] - self.food_pos[0]) ** 2 +
+                (self.snake_pos[1] - self.food_pos[1]) ** 2
+            )
+
+            # Reward based on distance change
+            if distance_after < distance_before:
+                reward = 1  # Positive reward for getting closer
+            else:
+                reward = -1  # Negative reward for moving away
+
+        # Penalize if game is over
         if self.done:
             reward = -10
 
